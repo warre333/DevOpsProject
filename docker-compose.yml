@@ -1,0 +1,43 @@
+services:
+  frontend:
+    build: frontend
+    ports:
+      - 80:80
+    depends_on:
+      - backend
+    networks:
+      - network1
+  backend:
+    build: backend
+    environment:
+      - STORAGE=mysql
+      - MYSQL_HOST=db
+      - MYSQL_DB=mydb
+      - MYSQL_USER=dbuser
+      - MYSQL_PWD=DitIsGoed
+    depends_on:
+      - db
+    networks:
+      - network1
+      - network2
+  db:
+    image: mysql:8.0.29-debian
+    environment:
+      - MYSQL_DATABASE=mydb
+      - MYSQL_ROOT_PASSWORD=my-secret-pw
+      - MYSQL_USER=dbuser
+      - MYSQL_PASSWORD=DitIsGoed  
+    volumes:
+      - db_volume:/var/lib/mysql
+      - ./sqlscripts:/docker-entrypoint-initdb.d
+    networks:
+      - network2
+    expose:
+      - 3306
+      
+volumes:
+  db_volume:
+
+networks:
+  network1:
+  network2:
